@@ -90,6 +90,7 @@ async function compute() {
      // asign geometry userstrings to object attributes
     if ( rhinoObject.geometry().userStringCount > 0 ) {
       const g_userStrings = rhinoObject.geometry().getUserStrings()
+      console.log(g_userStrings)
       rhinoObject.attributes().setUserString(g_userStrings[0][0], g_userStrings[0][1])
       
     }
