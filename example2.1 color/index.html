@@ -2,16 +2,40 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <title>RhinoCompute: GH SubD Object</title>
+        <title>LEO SS</title>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Tangerine">
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+        integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+        crossorigin=""/>
+        <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+        integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+        crossorigin=""></script>
+
+
+
         <style>
-            body { margin: 0; font-family: Arial, Helvetica, sans-serif; }
+            body { margin: 0; font-family: 'Open Sans', sans-serif; }
             input {width: 90%;}
-            #container {position: relative;}
-            #overlay {z-index: 1; width: 100%}
+            #container {display: flex;}
+            #sidebar {z-index: 1;
+                    flex: 0 0 500px;
+                    background-color: #000000;
+                    padding-left: 10px;
+                    padding-right: 10px;
+                    padding-top: 5px;
+                    height: 100vh;
+                    float: left;
+            }
+
+            #geomContainer{
+                flex: 1;
+                height: 100vh;
+                padding: 0px;
+            }
 
             #loader {
-                border: 5px solid #f3f3f3; /* Light grey */
-                border-top: 5px solid #3d3d3d; /* Grey */
+                border: 1px solid #f3f3f3; /* Light grey */
+                border-top: 1px solid #3d3d3d; /* Grey */
                 border-radius: 50%;
                 width: 40px;
                 height: 40px;
@@ -22,26 +46,83 @@
                 z-index: 2;
             }
 
+            .fixity{
+                width: 500px;
+            }
+
             @keyframes spin {
                 0% { transform: rotate(0deg); }
                 100% { transform: rotate(360deg); }
             }
+
+            #issMap{
+            padding: 2px;
+            width: 90%;
+            height: 400px;
+            }
+
+
         </style>
     </head>
     <body>
         <div id="loader"></div> 
         <div id="container">
-            <div id="overlay">
+            <div id="sidebar" style="color: #f3f3f3;">
                 <div>
-                    <input type="range" id="count" name="count" min="1" max="50" value="10" step="1">
-                    <label for="count">Count</label>
+                    <input type="range" id="roof" name="roof" min="1" max="20" value="1" step="1">
+                    <label for="roof">Roof</label>
                 </div>
                 <div>
-                    <input type="range" id="radius" name="radius" min="1" max="10" value="7" step="1">
-                    <label for="radius">Radius</label>
+                    <input type="range" id="floor" name="floor" min="1" max="20" value="1" step="1">
+                    <label for="Floor">Floor</label>
                 </div>
 
+                <div id="map_total">
+                    <h1>LEO SS Location</h1>
+                    <p>latitude: <span id="lat"></span><br />
+                        longitude: <span id="lon"></span>
+                     </p>
+                    <div id="issMap"></div>
+                    <script>
+
+                        //reference codingtrain 
+                        const api_url = 'https://api.wheretheiss.at/v1/satellites/25544'
+                        async function getISS() {
+                          const response = await fetch(api_url);
+                          const data = await response.json();
+                          const {latitude, longitude} = data;
+                    
+                        var map = L.map('issMap').setView([latitude, longitude], 3);
+                        L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
+                          attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+                          maxZoom: 18,
+                          id: 'mapbox/dark-v10',
+                          tileSize: 512,
+                          zoomOffset: -1,
+                          accessToken: 'pk.eyJ1IjoiczNjZyIsImEiOiJja3l1NXZzdmExYXVwMnFzMjliNW9yZHZtIn0.XyoSereFiHW-nQZpkUKv2Q'
+                    }).addTo(map);
+                    
+                          var circle = L.circle([latitude, longitude], {
+                                color: 'red',
+                                fillColor: 'red',
+                                radius: 500,
+                                }).addTo(map);
+                    
+                          document.getElementById('lat').textContent = latitude;
+                          document.getElementById('lon').textContent = longitude;
+                      
+                          console.log(latitude)
+                          console.log(longitude)
+                        }
+                    
+                        getISS();
+                        
+                      </script>
+                </div>
             </div>
+        
+        <div id="main_Container"></div>
+
         </div>
         <script type="module" src="script.js"></script>
     </body>
